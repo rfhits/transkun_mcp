@@ -1,0 +1,43 @@
+[project]
+name = "transkun-mcp"
+version = "0.1.0"
+description = "Transkun MIDI inference with MCP support"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "gradio[mcp]>=6.5.0",
+    "mcp>=1.26.0",
+    "transkun>=2.0.1",
+]
+
+[project.optional-dependencies]
+# 开关：用于触发不同的下载源
+torch-cpu = [
+    "torch",
+    "torchaudio",
+]
+torch-cuda128 = [
+    "torch",
+    "torchaudio",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+# 修复重叠问题：通过增加 'and extra != ...' 确保 marker 互斥
+torch = [
+  { index = "pytorch-cu128", marker = "extra == 'torch-cuda128'" },
+  { index = "pytorch-cpu", marker = "extra == 'torch-cpu' and extra != 'torch-cuda128'" },
+]
+torchaudio = [
+  { index = "pytorch-cu128", marker = "extra == 'torch-cuda128'" },
+  { index = "pytorch-cpu", marker = "extra == 'torch-cpu' and extra != 'torch-cuda128'" },
+]
